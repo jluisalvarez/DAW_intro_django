@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block head_content %}
+<title>Blog - Index</title>
+{% endblock %}
+
+{% block container %}
+
+<h1>My Blog</h1>
+
+<nav>
+    <a href="{% url 'new' %}">New</a>
+</nav>
+
+{% if msg %}
+<div class="alert alert-info alert-dismissible fade show" role="alert">
+ {{msg}}
+ <button type="button" class="btn-close" data-bs-dismiss="alert" arialabel="Close"></button>
+</div>
+{% endif %}
+
+<div class="container d-flex flex-wrap">
+{% for p in posts %}
+ <div class="col-4 mt-2">
+ <div class="card mx-2">
+ <div class="card-body">
+ <h5 class="card-title">{{p.title}}</h5>
+ <p class="card-text">{{p.body}}</p>
+ <p><small>{{p.created}}</small></p>
+ <a href="#" class="btn btn-info">Detail</a>
+ <a href="#" class="btn btn-success">Edit</a>
+ <a href="#" class="btn btn-danger">Delete</a>
+ <a href="#" class="btn btn-warning">Like</a>
+ </div>
+ </div>
+ </div>
+{% endfor %}
+</div>
+{% endblock%}

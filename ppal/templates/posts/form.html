@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block head_content %}
+<title>Blog - Index</title>
+{% endblock %}
+
+{% block container %}
+<h1>My Blog</h1>
+<h2>Create new Post</h2>
+{% if msg %}
+<div class="alert alert-{{type}} alert-dismissible fade show" role="alert">
+    {{msg}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" arialabel="Close"></button>
+</div>
+{% endif %}
+
+<div class="container">
+    <div class="row justify-content-md-center">
+        <div class="col-6 pt-3 pb-3" id="profile-box">
+            <h4 class="mb-4">Insert a new Post!</h4>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="user" value="{{ request.user.pk }}" />
+                <div class="form-group mt-2">
+                    <input  class="form-control {% if form.title.errors %}is-invalid{% endif %}"       
+                            type="text" name="title" placeholder="Title">
+                    <div class="invalid-feedback">
+                        {% for error in form.title.errors %}{{ error }}{% endfor %}
+                    </div>
+                </div>
+                <div class="form-group mt-2">
+                    <input  class="form-control {% if form.body.errors %}is-invalid{% endif %}"
+                            type="text" name="body" placeholder="Body" />
+                    <div class="invalid-feedback">
+                        {% for error in form.body.errors %}{{ error }}{% endfor %}
+                    </div>
+                </div>
+ 
+                <button type="submit" class="btn btn-primary btn-block mt5"> Publish!</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock%}
