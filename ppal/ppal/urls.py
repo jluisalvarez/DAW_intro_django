@@ -24,7 +24,7 @@ def holamundo2(request):
 
 from django.shortcuts import render
 
-from blog.views import index, new_post
+from blog.views import *
 
 def holamundo(request):
     return render(request, 'index.html', {})
@@ -34,5 +34,9 @@ urlpatterns = [
     path('hm/', holamundo),
 
     path('', index, name='index'),
-    path('new', new_post, name='new')
+    path('new', new_post, name='new'),
+    path('details/<int:id>', details, name='details'),
+    path('edit/<int:id>', edit, name='edit'),
+    path('delete/<int:id>', delete, name='delete'),
+    path('like/<int:id>', like, name='like'),
 ]

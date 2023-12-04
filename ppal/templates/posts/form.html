@@ -6,7 +6,12 @@
 
 {% block container %}
 <h1>My Blog</h1>
-<h2>Create new Post</h2>
+
+<nav>
+    <a href="{% url 'index' %}">Home</a>
+</nav>
+
+<h2>{% if id %} Edit {% else %} Create new {% endif %} Post</h2>
 {% if msg %}
 <div class="alert alert-{{type}} alert-dismissible fade show" role="alert">
     {{msg}}
@@ -17,20 +22,20 @@
 <div class="container">
     <div class="row justify-content-md-center">
         <div class="col-6 pt-3 pb-3" id="profile-box">
-            <h4 class="mb-4">Insert a new Post!</h4>
+            <h4 class="mb-4">{% if id %} Edit {% else %} Insert new {% endif %} Post!</h4>
             <form method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
-                <input type="hidden" name="user" value="{{ request.user.pk }}" />
+                <input type="hidden" name="id" value="{{ id }}" />
                 <div class="form-group mt-2">
                     <input  class="form-control {% if form.title.errors %}is-invalid{% endif %}"       
-                            type="text" name="title" placeholder="Title">
+                            type="text" name="title" {% if id %} value="{{ form.title.value }}" {% endif %} placeholder="Title" />
                     <div class="invalid-feedback">
                         {% for error in form.title.errors %}{{ error }}{% endfor %}
                     </div>
                 </div>
                 <div class="form-group mt-2">
                     <input  class="form-control {% if form.body.errors %}is-invalid{% endif %}"
-                            type="text" name="body" placeholder="Body" />
+                            type="text" name="body" {% if id %}  value="{{ form.body.value }}" {% endif %}  placeholder="Body" />
                     <div class="invalid-feedback">
                         {% for error in form.body.errors %}{{ error }}{% endfor %}
                     </div>

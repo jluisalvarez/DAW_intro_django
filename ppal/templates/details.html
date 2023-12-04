@@ -10,7 +10,6 @@
 
 <nav>
     <a href="{% url 'index' %}">Home</a>
-    <a href="{% url 'new' %}">New</a>
 </nav>
 
 {% if msg %}
@@ -21,19 +20,17 @@
 {% endif %}
 
 <div class="container d-flex flex-wrap">
-{% for p in posts %}
+
     <div class="col-4 mt-2">
         <div class="card mx-2">
             <div class="card-body">
-                <h5 class="card-title">{{p.title}} </h5>
-                <p class="card-text">{{p.body}}</p>
-                <p><small>{{p.created}} ({{p.likes}} likes) </small></p>
-                <a href="{% url 'details' p.id %}" class="btn btn-info">Detail</a>
-                <a href="{% url 'edit' p.id %}" class="btn btn-success">Edit</a>
-                <a onclick="return borrar('{{p.title}}');" href="{% url 'delete' p.id %}" class="btn btn-danger">Delete</a>
+                <h5 class="card-title">{{post.title}}</h5>
+                <p class="card-text">{{post.body}}</p>
+                <p><small>{{post.created}}</small> (likes: {{post.likes}})</p>
+                <a href="{% url 'like' post.id %}" class="btn btn-warning">Like</a>
             </div>
         </div>
     </div>
-{% endfor %}
 </div>
+
 {% endblock%}

@@ -9,11 +9,11 @@ Utiliza el patrón MTV (similar al MVC):
 * T – Template: Capa de presentación, las vistas en un MVC puro
 * V – View. Controlador en el MVC
 
-0.- Instalar Python (este paso no se detalla aquí)
+## 0.- Instalar Python (este paso no se detalla aquí)
 
 https://www.python.org/downloads/
 
-1.- Entorno Virtual
+## 1.- Entorno Virtual
 
 Crear entorno virtual:
 
@@ -33,7 +33,7 @@ pip 22.3.1 from C:\DAW\django\entorno\Lib\site-packages\pip (python 3.11)
 
 Para linux sería: source entorno/bin/activate
 
-2.- Instalar Django
+## 2.- Instalar Django
 
 Puedes comprobar las versiones de Django disponibles con: ```pip index versions Django```
 
@@ -74,7 +74,7 @@ sqlparse==0.4.4
 tzdata==2023.3
 ```
 
-3.- Crear un proyecto
+## 3.- Crear un proyecto
 
 ```
 (entorno) C:\DAW\django> django-admin startproject ppal
@@ -108,7 +108,7 @@ NOTA: Como ves aparece el mensaje de que tenemos 18 migraciones no aplicadas. M�
 
 Ahora se puede acceder en un navegador a la dirección: http://127.0.0.1:8000/
 
-4.- Configurar URLs
+## 4.- Configurar URLs
 
 Django usa el patrón MTV como se muestra en la figura:
 
@@ -140,7 +140,7 @@ Volvamos a iniciar el proyecto y veamos el resultado en el navegador:
 Para más información sobre los patrones URL consultar:
 https://docs.djangoproject.com/en/4.2/topics/http/urls/
 
-5.- Crear una aplicación
+## 5.- Crear una aplicación
 
 Un proyecto Django consta de varias aplicaciones.
 
@@ -177,7 +177,7 @@ INSTALLED_APPS = [
 ]
 ```
 
-6.- Migraciones
+## 6.- Migraciones
 
 Por defecto Django utiliza Sqlite3 como base de datos, para configurar la base de datos se
 utiliza la variable DATABASES del fichero settings.py del proyecto:
@@ -269,9 +269,9 @@ Running migrations:
 Ahora si conectamos con la Base de Datos podemos ver las tablas creadas por
 las migraciones. Para Sqlite3 utiliza por ejemplo DB Browser for SQLite.
 
-7.- Modelos: Crear modelo Post
+## 7. - Modelos
 
-En el fichero models.py de la aplicación Blog crear la clase Post:
+Crear modelo Post. En el fichero models.py de la aplicación Blog crear la clase Post:
 
 ```python
 from django.db import models
@@ -339,7 +339,7 @@ Puedes utilizar la documentación para más información sobre la creación y co
 https://docs.djangoproject.com/en/4.2/topics/db/queries/
 
 
-8.- Templates
+## 8.- Templates
 
 https://docs.djangoproject.com/en/4.2/ref/settings/#std-setting-TEMPLATES
 
@@ -450,7 +450,7 @@ Django buscará el path en el fichero urls.py, identificará que debe ejecutar l
 holamundo y esta función buscará el templata index.html, que a su vez extiende del template
 base.html.
 
-9. Views
+## 9. Views
 
 ((Recuerda, las Views del patrón MTV equivalen a los controladores del patrón MVC puro)).
 
@@ -534,7 +534,7 @@ Modifiquemos ahora el template index.html para ver el contenido:
                 <h5 class="card-title">{{p.title}}</h5>
                 <p class="card-text">{{p.body}}</p>
                 <p><small>{{p.created}}</small></p>
-                <a href="#" class="btn btn-info">Detail</a>
+                <a href="{% url 'delete' p.id %}" class="btn btn-info">Detail</a>
                 <a href="#" class="btn btn-success">Edit</a>
                 <a href="#" class="btn btn-danger">Delete</a>
                 <a href="#" class="btn btn-warning">Like</a>
@@ -546,9 +546,7 @@ Modifiquemos ahora el template index.html para ver el contenido:
 {% endblock%}
 ```
 
-
-
-10. Trabajando con Formularios
+## 10. Trabajando con Formularios
 
 https://docs.djangoproject.com/en/4.2/topics/forms/
 https://docs.djangoproject.com/en/4.2/topics/forms/modelforms/
@@ -567,6 +565,8 @@ class PostForm(ModelForm):
         fields = ['title', 'body']
 ```
 
+Creamos el template post/form.html
+
 ```html
 {% extends 'base.html' %}
 
@@ -576,7 +576,12 @@ class PostForm(ModelForm):
 
 {% block container %}
 <h1>My Blog</h1>
-<h2>Create new Post</h2>
+
+<nav>
+    <a href="{% url 'index' %}">Home</a>
+</nav>
+
+<h2>{% if id %} Edit {% else %} Create new {% endif %} Post</h2>
 {% if msg %}
 <div class="alert alert-{{type}} alert-dismissible fade show" role="alert">
     {{msg}}
@@ -587,19 +592,20 @@ class PostForm(ModelForm):
 <div class="container">
     <div class="row justify-content-md-center">
         <div class="col-6 pt-3 pb-3" id="profile-box">
-            <h4 class="mb-4">Insert a new Post!</h4>
+            <h4 class="mb-4">{% if id %} Edit {% else %} Insert new {% endif %} Post!</h4>
             <form method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
+                <input type="hidden" name="id" value="{{ id }}" />
                 <div class="form-group mt-2">
                     <input  class="form-control {% if form.title.errors %}is-invalid{% endif %}"       
-                            type="text" name="title" placeholder="Title">
+                            type="text" name="title" {% if id %} value="{{ form.title.value }}" {% endif %} placeholder="Title" />
                     <div class="invalid-feedback">
                         {% for error in form.title.errors %}{{ error }}{% endfor %}
                     </div>
                 </div>
                 <div class="form-group mt-2">
                     <input  class="form-control {% if form.body.errors %}is-invalid{% endif %}"
-                            type="text" name="body" placeholder="Body" />
+                            type="text" name="body" {% if id %}  value="{{ form.body.value }}" {% endif %}  placeholder="Body" />
                     <div class="invalid-feedback">
                         {% for error in form.body.errors %}{{ error }}{% endfor %}
                     </div>
@@ -613,36 +619,214 @@ class PostForm(ModelForm):
 {% endblock%}
 ```
 
-URLs
+### Añadir atributos al modelo
+
+Añadimos el atributo likes
 
 ```python
+from django.db import models
+
+class Post(models.Model):
+    title = models.CharField(max_length=250)
+    body = models.TextField()
+    likes = models.PositiveIntegerField(default=0)
+    publish = models.DateTimeField(null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
+```
+
+```
+python manage.py makemigrations
+Migrations for 'blog':
+  blog\migrations\0002_post_likes.py
+    - Add field likes to post
+```
+
+```
+python manage.py makemigrations
+Migrations for 'blog':
+  blog\migrations\0002_post_likes.py
+    - Add field likes to post
+```
+
+### NUEVO POST
+
+Añadir URL:
+
+```
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('hm/', holamundo),
+    ...
 
-    path('', index, name='index'),
-    path('new', new_post, name='new')
+    path('new', new_post, name='new'),
+    
+]
+```
+Añadir en blog/views.py la acción para guardar los post
 
-    path('delete/<int:id>', delete_post, name='delete_post'),
-    path('edit/<int:id>', edit_post, name='edit_post'),
+```python
+def new_post(request):
+    if request.method == 'POST':
+        form = PostForm(request.POST)
+        if form.is_valid():
+            form.save()
+        return redirect('index')
+    else:
+        form = PostForm()
+    return render(request, 'posts/form.html', {'form': form})
+```
+
+### Editar
+
+El formulario ya está preparado para editar. 
+
+URL
+```python
+urlpatterns = [
+
+    ...
+    path('edit/<int:id>', edit, name='edit'),
+
 ]
 ```
 
+Acción 
+```python
+def edit(request, id):
+    try:
+        post = Post.objects.get(pk=id)
+    except Post.DoesNotExist:
+        msg = "Post #" + str(id) + " no encontrado"
+        return render(request, 'index.html', {'msg': msg})  
 
-DELETE
+    if request.method == 'POST':
+        form = PostForm(request.POST, instance=post)
+        if form.is_valid():
+            form.save()
+        return redirect('index')
+    else:
+        form = PostForm(instance=post)
+ 
+    return render(request, 'posts/form.html', {'form': form, 'id':id})
+```
+
+### Detalles
+
+URL
+```python
+urlpatterns = [
+    ...
+    path('details/<int:id>', details, name='details'),
+
+]
+```
+
+Acción:
+```python
+def details(request, id):
+    try:
+        post = Post.objects.get(pk=id)
+    except Post.DoesNotExist:
+        msg = "Post #" + str(id) + " no encontrado"
+        return render(request, 'index.html', {'msg': msg})
+    msg = "Detalles Post: " + str(id)
+    return render(request, 'details.html', {'msg': msg, 'post': post})
+```
+
+Template: details.html
+
+```html
+{% extends 'base.html' %}
+
+{% block head_content %}
+<title>Blog - Index</title>
+{% endblock %}
+
+{% block container %}
+
+<h1>My Blog</h1>
+
+<nav>
+    <a href="{% url 'index' %}">Home</a>
+</nav>
+
+{% if msg %}
+<div class="alert alert-info alert-dismissible fade show" role="alert">
+ {{msg}}
+ <button type="button" class="btn-close" data-bs-dismiss="alert" arialabel="Close"></button>
+</div>
+{% endif %}
+
+<div class="container d-flex flex-wrap">
+
+    <div class="col-4 mt-2">
+        <div class="card mx-2">
+            <div class="card-body">
+                <h5 class="card-title">{{post.title}}</h5>
+                <p class="card-text">{{post.body}}</p>
+                <p><small>{{post.created}}</small> (likes: {{post.likes}})</p>
+                <a href="{% url 'like' post.id %}" class="btn btn-warning">Like</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock%}
+```
+
+
+### DELETE
+
+Añadimos la URL:
 
 ```python
-def delete_post(request, id):
+urlpatterns = [
+    ...
+    path('delete/<int:id>', delete, name='delete'),
+
+]
+```
+
+Añadimos la acción delete en el controlador (views.py)
+
+```python
+def delete(request, id):
     try:
         post = Post.objects.get(pk=id)
         post.delete()
     except Post.DoesNotExist:
         msg = "Post #" + str(id) + " no encontrado"
- 
+        return render(request, 'index.html', {'msg': msg})
+    msg = "Borrado Post: " + str(id)
     posts = Post.objects.all()
-    return render(request, 'index.html', {'type': tipo, 'msg': msg, 'posts': posts})
+    return render(request, 'index.html', {'msg': msg, 'posts': posts})
 ```
 
+### Dar likes
 
+URL:
+```
+urlpatterns = [
+    ...
 
+    path('like/<int:id>', like, name='like'),
+]
+```
 
+Acción:
+
+```python
+def like(request, id):
+    try:
+        post = Post.objects.get(pk=id)
+        post.likes = post.likes+1
+        post.save()
+    except Post.DoesNotExist:
+        msg = "Post #" + str(id) + " no encontrado"
+        return render(request, 'index.html', {'msg': msg})    
+    msg = "Like Post: " + str(id)
+    return render(request, 'details.html', {'msg': msg, 'post': post})
+
+```
