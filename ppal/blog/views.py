@@ -29,7 +29,6 @@ def details(request, id):
 
 
 def edit(request, id):
-
     try:
         post = Post.objects.get(pk=id)
     except Post.DoesNotExist:
